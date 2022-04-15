@@ -1,6 +1,6 @@
 package controllers
 
-import com.google.inject.{Inject, Singleton}
+import com.google.inject.Inject
 import models.UrlData
 import play.api.{Logger, Logging}
 import play.api.libs.json.{JsResult, JsSuccess, JsValue, Json}
@@ -32,12 +32,12 @@ class HomeController @Inject()(cc: ControllerComponents,urlShortener: UrlShorten
   }
 
 
-  def getUrl(urlOriginal:String) = Action{
+  def getUrl(urlOriginal:String): Action[AnyContent] = Action{
     Log.info(s"Looking for $urlOriginal")
     processReply(urlShortener.get(urlOriginal))
   }
 
-  def createUrl()=Action { request =>
+  def createUrl(): Action[AnyContent] =Action { request =>
     def reads(json: JsValue): JsResult[urlPost] = {
       val v1 = (json \ "url").as[String]
       JsSuccess(urlPost(v1))

@@ -22,8 +22,7 @@ class InMemoryDataStore @Inject() (config:Configuration,urlCreator:UrlCreator) e
 
   private val urlRegex: Regex = """^(http|https):\/\/""".r
   private val inMemory= new HashMap[String,UrlData]
-//  private val UrlDomain=config.get[String]("UrlDomain")
-  private val UrlDomain="RickMorty.com"
+  private val UrlDomain=config.get[String]("UrlDomain")
 
   private def  createUrlByCode(prefix:String,code:String):String=s"$prefix$UrlDomain/$code"
 

@@ -4,20 +4,13 @@ package services
 import org.scalatestplus.play.PlaySpec
 import com.typesafe.config.ConfigFactory
 import play.api.Configuration
-import play.inject.guice.GuiceApplicationBuilder
-
-import java.io.File
 
 
 
 class UrlShortenerTest extends PlaySpec {
 
   val urlCreator = new UrlCreator
-//  val ff= new File("test/conf/application.conf")
-//  val  guiceApplicationBuilder = new GuiceApplicationBuilder()
-//    .withConfigLoader(x=> ConfigFactory.load("test/conf/application.conf"))
-//  val app= guiceApplicationBuilder.build
-  val testConfiguration: Configuration= Configuration(ConfigFactory.load("test/conf/application.conf"))
+  val testConfiguration: Configuration= Configuration(ConfigFactory.load("application-test"))
 
   val inMemoryDataStore= new InMemoryDataStore(testConfiguration,new UrlCreator)
   val urlShortenerService= new UrlShortenerService(inMemoryDataStore)
@@ -26,24 +19,24 @@ class UrlShortenerTest extends PlaySpec {
     "should work" in{
       val res=urlShortenerService.shorten("http://www.abc.com/aaa/bbb/ccc")
       res.isDefined mustBe true
-      res.get.shortUrl.substring(0,20) mustBe "http://RickMorty.com"
+      res.get.shortUrl.substring(0,24) mustBe "http://RickMortyTest.com"
     }
   }
 
   "standard functionality of creation " must{
-    "should has length 28 with http" in{
+    "should has length 32 with http" in{
       val res=urlShortenerService.shorten("http://www.abc.com/aaa/bbb/ccc/llll")
       res.isDefined mustBe true
-      res.get.shortUrl.length mustBe 28
+      res.get.shortUrl.length mustBe 32
     }
   }
 
   "standard functionality of creation " must{
-    "should work with https and len 29" in{
+    "should work with https and len 33" in{
       val res=urlShortenerService.shorten("https://www.abc.com/aaa/bbb/ccc/llll")
       res.isDefined mustBe true
       res.get.shortUrl.substring(0,5) mustBe "https"
-      res.get.shortUrl.length mustBe 29
+      res.get.shortUrl.length mustBe 33
     }
   }
 
