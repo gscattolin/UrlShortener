@@ -23,6 +23,10 @@ class HomeController @Inject()(cc: ControllerComponents,urlShortener: UrlShorten
   }
 
 
+  def index: Action[AnyContent] = Action{
+    Ok("Url Shortener Test")
+  }
+
   def getUrl(urlOriginal:String): Action[AnyContent] = Action{
     Log.debug(s"Looking for $urlOriginal")
     processReply(urlShortener.get(urlOriginal))
@@ -43,4 +47,5 @@ class HomeController @Inject()(cc: ControllerComponents,urlShortener: UrlShorten
     val urlValue = json.as[urlPost](reads)
     processReply(urlShortener.shorten(urlValue.url))
   }
+
 }
