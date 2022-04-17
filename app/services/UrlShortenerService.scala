@@ -14,13 +14,15 @@ trait UrlShortener {
 
   def get(code: String): Option[UrlData]
 
+  def getOriginalUrl(shortUrl:String): Option[UrlData]
+
   def stats(urlOriginal:String): Option[Stats]
 
 }
 
 class UrlShortenerService @Inject() (dataStore:dataUrlsStore) extends UrlShortener with Logging{
 
-  private val urlRegex: Regex = """^(http|https):\/\/([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$""".r
+  private val urlRegex: Regex = """^(https?|http)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]""".r
 
   private def isValidUrl(urlOriginal:String): Boolean = {
     urlRegex.unapplySeq(urlOriginal).isDefined
@@ -44,9 +46,23 @@ class UrlShortenerService @Inject() (dataStore:dataUrlsStore) extends UrlShorten
     }
   }
 
-  override def get(code: String): Option[UrlData] = {
-    dataStore.load(code)
+  override def get(shortUrl: String): Option[UrlData] = {
+    if (!isValidUrl(shortUrl)){
+      logger.error(s"Url is not valid $shortUrl")
+      None
+    }else {
+      dataStore.load(shortUrl)
+    }
   }
 
   override def stats(urlOriginal: String): Option[Stats] = ???
+
+  override def getOriginalUrl(shortUrl: String):  Option[UrlData] = {
+    if (!isValidUrl(shortUrl)){
+      logger.error(s"Url is not valid $shortUrl")
+      None
+    }else {
+      dataStore.loadOriginal(shortUrl)
+    }
+  }
 }

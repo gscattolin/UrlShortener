@@ -14,6 +14,7 @@ trait dataUrlsStore{
 
   def save(urlOriginal:String):UrlData
   def load(urlOriginal:String):Option[UrlData]
+  def loadOriginal(shortUrl:String):Option[UrlData]
   def purge():Option[Int]
 }
 
@@ -26,17 +27,31 @@ class InMemoryDataStore @Inject() (config:Configuration,urlCreator:UrlCreator) e
 
   private def  createUrlByCode(prefix:String,code:String):String=s"$prefix$UrlDomain/$code"
 
+
   override def save(urlOriginal:String ): UrlData = {
     val hasValue=urlCreator.createShortCode(urlOriginal)
     val prefix=urlRegex.findFirstIn(urlOriginal).get
-    val urlData=UrlData(urlOriginal,createUrlByCode(prefix,hasValue),DateTime.now)
-    inMemory += hasValue -> urlData
+    val urlData= UrlData(urlOriginal,createUrlByCode(prefix,hasValue),DateTime.now)
+    inMemory += hasValue ->urlData
     urlData
   }
 
   override def load(urlOriginal: String): Option[UrlData] = {
     val code=urlCreator.createShortCode(urlOriginal)
     inMemory.get(code)
+  }
+
+  def loadOriginal(shortUrl:String):Option[UrlData] = {
+    val prefix=urlRegex.findFirstIn(shortUrl).get
+    val startingPos=prefix.length+UrlDomain.length+1
+    var urlData:Option[UrlData]=None
+    if (startingPos<shortUrl.length){
+      val code=shortUrl.substring(startingPos)
+      if (inMemory.contains(code)){
+        urlData=inMemory.get(code)
+      }
+    }
+    urlData
   }
 
   override def purge(): Option[Int] =  ???

@@ -14,15 +14,6 @@ class HomeController @Inject()(cc: ControllerComponents,urlShortener: UrlShorten
   private final case class urlPost(url:String)
   protected val Log: Logger = Logger(this.getClass)
 
-  /**
-   * Create an Action to render an HTML page with a welcome message.
-   * The configuration in the `routes` file means that this method
-   * will be called when the application receives a `GET` request with
-   * a path of `/`.
-   */
-  def index = Action {
-    Ok(views.html.index())
-  }
 
   private def processReply(urlData:Option[UrlData]):Result={
     urlData match {
@@ -33,8 +24,13 @@ class HomeController @Inject()(cc: ControllerComponents,urlShortener: UrlShorten
 
 
   def getUrl(urlOriginal:String): Action[AnyContent] = Action{
-    Log.info(s"Looking for $urlOriginal")
+    Log.debug(s"Looking for $urlOriginal")
     processReply(urlShortener.get(urlOriginal))
+  }
+
+  def getOriginalUrl(shortUrl:String): Action[AnyContent] = Action{
+    Log.debug(s"Looking for original Url from $shortUrl")
+    processReply(urlShortener.get(shortUrl))
   }
 
   def createUrl(): Action[AnyContent] =Action { request =>
@@ -42,7 +38,7 @@ class HomeController @Inject()(cc: ControllerComponents,urlShortener: UrlShorten
       val v1 = (json \ "url").as[String]
       JsSuccess(urlPost(v1))
     }
-    Log.info("receive post")
+    Log.debug("receive post")
     val json = request.body.asJson.get
     val urlValue = json.as[urlPost](reads)
     processReply(urlShortener.shorten(urlValue.url))

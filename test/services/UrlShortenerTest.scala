@@ -6,7 +6,6 @@ import com.typesafe.config.ConfigFactory
 import play.api.Configuration
 
 
-
 class UrlShortenerTest extends PlaySpec {
 
   val urlCreator = new UrlCreator
@@ -60,6 +59,30 @@ class UrlShortenerTest extends PlaySpec {
       val res2=urlShortenerService.shorten("https://www.abc.com/eee/bbb/ccc")
       val loaded=urlShortenerService.get("https://www.abc.com/eee/bbb/ccc")
       loaded.isDefined mustBe true
+    }
+  }
+
+  "standard functionality of fetching reversing from short-> long url" must{
+    "should work" in{
+      val res1=urlShortenerService.shorten("https://www.abc.com/aaa/bbb/ccc")
+      val originalUrl=urlShortenerService.getOriginalUrl( res1.get.shortUrl)
+      originalUrl.isDefined mustBe true
+      originalUrl.get.originalUrl mustBe "https://www.abc.com/aaa/bbb/ccc"
+    }
+  }
+
+
+  "standard functionality of fetching reversing from short-> long url" must{
+    "should not work for invalid url" in{
+      val originalUrl=urlShortenerService.getOriginalUrl( "hggp://aaa.com/asas")
+      originalUrl.isDefined mustBe false
+    }
+  }
+
+  "standard functionality of fetching reversing from short-> long url" must{
+    "should not work for not existence url" in{
+      val originalUrl=urlShortenerService.getOriginalUrl( "http://aaa.com/asas/bbb")
+      originalUrl.isDefined mustBe false
     }
   }
 
